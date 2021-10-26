@@ -1,87 +1,47 @@
 #include "sort.h"
 
 /**
- * *swap_nodes - swaps two nodes
- * @n: node 1
- * @b: node 2
- * @head: head of the list
- * Return: pointer to head if changed or NULL
+ * counting_sort - Sorts an array using the counting sort algorithm.
+ * @array: The array to sort.
+ * @size: The length of the array.
  */
-
-listint_t *swap_nodes(listint_t *n, listint_t *b, listint_t *head)
+void counting_sort(int *array, size_t size)
 {
-	listint_t *tmp;
+	int *count_arr = NULL, *array_sorted = NULL, max_val = 0;
+	size_t i;
 
-	tmp = n->next;
-	tmp->prev = b;
-	n->next = b->next;
-	b->next = tmp;
-	if (n->next != NULL)
-		n->next->prev = n;
-
-	tmp = n->prev;
-	if (tmp != NULL)
-	{
-		n->prev = b->prev;
-		n->prev->next = n;
-		b->prev = tmp;
-		b->prev->next = b;
-		print_list(head);
-		return (NULL);
-	}
-	n->prev = b->prev;
-	n->prev->next = n;
-	b->prev = tmp;
-	print_list(b);
-	return (b);
-}
-/**
- * cocktail_sort_list - sort a list using
- * cocktail_sort algorithm
- * @list: pointer to the list head
- * Return: void
- */
-
-void cocktail_sort_list(listint_t **list)
-{
-	listint_t *start, *end, *current, *new_head;
-	int swapped = 1, i = 0, j, e = 0;
-
-	if (!list || !(*list) || !(*list)->next)
+	if ((array == NULL) || (size < 2))
 		return;
-	start = *list, current = start;
-	while (swapped == 1)
+	for (i = 0; i < size; i++)
 	{
-		swapped = 0;
-		while (current && current->next)
-		{
-			if (current->n > current->next->n)
-			{
-				end = current, current = current->next;
-				new_head = swap_nodes(current->prev, current, *list), swapped = 1;
-				if (new_head != NULL)
-					*list = new_head, start = *list;
-			} else
-				current = current->next, end = current;
-		}
-		if (swapped == 0)
-			break;
-		for (j = 0; j < i; j++)
-			start = start->next;
-		swapped = 0, e++;
-		while (end && end->next != NULL)
-			end = end->next;
-		for (j = 0; j < e; j++)
-			end = end->prev;
-		current = end;
-		while (current && current->prev && current != start->prev)
-		{
-			if (current->n > current->next->n)
-			{
-				new_head = swap_nodes(current, current->next, *list), swapped = 1;
-			}
-			current = current->prev;
-		}
-		i++, start = start->next;
+		max_val = (array[i] > max_val ? array[i] : max_val);
+		if (array[i] < 0)
+			return;
 	}
+	count_arr = malloc(sizeof(int) * (max_val + 1));
+	if (count_arr == NULL)
+		return;
+	array_sorted = malloc(sizeof(int) * size);
+	if (array_sorted == NULL)
+	{
+		free(count_arr);
+		return;
+	}
+	for (i = 0; i < (size_t)(max_val + 1); i++)
+		count_arr[i] = 0;
+	for (i = 0; i < size; i++)
+		count_arr[array[i]]++;
+	for (i = 1; i < (size_t)(max_val + 1); i++)
+		count_arr[i] += count_arr[i - 1];
+	print_array(count_arr, max_val + 1);
+	for (i = size - 1; ; i--)
+	{
+		count_arr[array[i]]--;
+		array_sorted[count_arr[array[i]]] = array[i];
+		if (i == 0)
+			break;
+	}
+	for (i = 0; i < size; i++)
+		array[i] = array_sorted[i];
+	free(array_sorted), free(count_arr);
 }
