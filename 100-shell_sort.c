@@ -1,34 +1,30 @@
 #include "sort.h"
 
 /**
- * shell_sort - sorts an array using shell sort algorithm
- * @array: array
- * @size: size of the array
- * Return: void
+ * shell_sort - Sorts an array using the shell sort algorithm.
+ * @array: The array to sort.
+ * @size: The length of the array.
  */
 void shell_sort(int *array, size_t size)
 {
-	int h = 1, in, out, tmp;
+	int i, j, tmp, gap = 0;
 
-	if (array == NULL || size < 2)
+	if ((array == NULL) || (size < 2))
 		return;
-	while (h <= ((int)size / 3))
-		h = (h * 3) + 1;
-
-	while (h > 0)
+	while (gap <= ((int)size / 3))
+		gap = (gap * 3) + 1;
+	for (; gap > 0; )
 	{
-		for (out = h; out < (int)size; out++)
+		for (i = gap; i < (int)size; i++)
 		{
-			tmp = array[out];
-			in = out;
-			while (in >= h && array[in - h] > tmp)
+			tmp = array[i];
+			for (j = i; (j >= gap) && (array[j - gap] > tmp); j -= gap)
 			{
-				array[in] = array[in - h];
-				in = in - h;
+				array[j] = array[j - gap];
 			}
-			array[in] = tmp;
+			array[j] = tmp;
 		}
-		h = (h - 1) / 3;
+		gap = (gap - 1) / 3;
 		print_array(array, size);
 	}
 }

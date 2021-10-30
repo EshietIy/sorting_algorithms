@@ -1,47 +1,49 @@
 #include "sort.h"
-/**
- * swap_elements - swaps elements in an array
- * @array: array to swap on
- * @a: the first element
- * @b: the second element
- *
- */
-void swap_elements(int *array, unsigned int a, unsigned int b)
-{
-int temp;
 
-temp = array[a];
-array[a] = array[b];
-array[b] = temp;
+/**
+ * swap_items - Swaps two items in an array.
+ * @array: The array to modify.
+ * @l: The index of the left item.
+ * @r: The index of the right item.
+ */
+void swap_items(int *array, size_t l, size_t r)
+{
+	int tmp;
+
+	if (array != NULL)
+	{
+		tmp = array[l];
+		array[l] = array[r];
+		array[r] = tmp;
+	}
 }
 
 /**
- * selection_sort - selection sort alogorithm
- * @array: the array sort
- * @size: size of the array
- *
+ * selection_sort - Sorts an array using the selection sort algorithm.
+ * @array: The array to sort.
+ * @size: The length of the array.
  */
 void selection_sort(int *array, size_t size)
 {
-unsigned int i, j, min;
-if (!array || size == 0 || size == 1)
-return;
-i = 0;
-while (i < size - 1)
-{
-min = i;
-j = i + 1;
-while (j < size)
-{
-if (array[j] < array[min])
-min = j;
-j++;
-}
-if (min != i)
-{
-swap_elements(array, i, min);
-print_array(array, size);
-}
-i++;
-}
+	size_t i, j, low_idx;
+
+	if (array != NULL)
+	{
+		for (i = 0; i < size - 1; i++)
+		{
+			low_idx = i;
+			for (j = size - 1; j > i; j--)
+			{
+				if (array[j] < array[low_idx])
+				{
+					low_idx = j;
+				}
+			}
+			if (i != low_idx)
+			{
+				swap_items(array, i, low_idx);
+				print_array(array, size);
+			}
+		}
+	}
 }
