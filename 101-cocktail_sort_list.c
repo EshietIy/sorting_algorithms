@@ -1,47 +1,99 @@
+
 #include "sort.h"
 
-/**
- * counting_sort - Sorts an array using the counting sort algorithm.
- * @array: The array to sort.
- * @size: The length of the array.
- */
-void counting_sort(int *array, size_t size)
-{
-	int *count_arr = NULL, *array_sorted = NULL, max_val = 0;
-	size_t i;
+void swap_node_ahead(listint_t **list, listint_t **tail, listint_t **shaker);
+void swap_node_behind(listint_t **list, listint_t **tail, listint_t **shaker);
+void cocktail_sort_list(listint_t **list);
 
-	if ((array == NULL) || (size < 2))
+/**
+ * swap_node_ahead - Swap a node in a listint_t doubly-linked list
+ *                   list of integers with the node ahead of it.
+ * @list: A pointer to the head of a doubly-linked list of integers.
+ * @tail: A pointer to the tail of the doubly-linked list.
+ * @shaker: A pointer to the current swapping node of the cocktail shaker algo.
+ */
+void swap_node_ahead(listint_t **list, listint_t **tail, listint_t **shaker)
+{
+	listint_t *tmp = (*shaker)->next;
+
+	if ((*shaker)->prev != NULL)
+		(*shaker)->prev->next = tmp;
+	else
+		*list = tmp;
+	tmp->prev = (*shaker)->prev;
+	(*shaker)->next = tmp->next;
+	if (tmp->next != NULL)
+		tmp->next->prev = *shaker;
+	else
+		*tail = *shaker;
+	(*shaker)->prev = tmp;
+	tmp->next = *shaker;
+	*shaker = tmp;
+}
+
+/**
+ * swap_node_behind - Swap a node in a listint_t doubly-linked
+ *                    list of integers with the node behind it.
+ * @list: A pointer to the head of a doubly-linked list of integers.
+ * @tail: A pointer to the tail of the doubly-linked list.
+ * @shaker: A pointer to the current swapping node of the cocktail shaker algo.
+ */
+void swap_node_behind(listint_t **list, listint_t **tail, listint_t **shaker)
+{
+	listint_t *tmp = (*shaker)->prev;
+
+	if ((*shaker)->next != NULL)
+		(*shaker)->next->prev = tmp;
+	else
+		*tail = tmp;
+	tmp->next = (*shaker)->next;
+	(*shaker)->prev = tmp->prev;
+	if (tmp->prev != NULL)
+		tmp->prev->next = *shaker;
+	else
+		*list = *shaker;
+	(*shaker)->next = tmp;
+	tmp->prev = *shaker;
+	*shaker = tmp;
+}
+
+/**
+ * cocktail_sort_list - Sort a listint_t doubly-linked list of integers in
+ *                      ascending order using the cocktail shaker algorithm.
+ * @list: A pointer to the head of a listint_t doubly-linked list.
+ */
+void cocktail_sort_list(listint_t **list)
+{
+	listint_t *tail, *shaker;
+	bool shaken_not_stirred = false;
+
+	if (list == NULL || *list == NULL || (*list)->next == NULL)
 		return;
-	for (i = 0; i < size; i++)
+
+	for (tail = *list; tail->next != NULL;)
+		tail = tail->next;
+
+	while (shaken_not_stirred == false)
 	{
-		max_val = (array[i] > max_val ? array[i] : max_val);
-		if (array[i] < 0)
-			return;
+		shaken_not_stirred = true;
+		for (shaker = *list; shaker != tail; shaker = shaker->next)
+		{
+			if (shaker->n > shaker->next->n)
+			{
+				swap_node_ahead(list, &tail, &shaker);
+				print_list((const listint_t *)*list);
+				shaken_not_stirred = false;
+			}
+		}
+		for (shaker = shaker->prev; shaker != *list;
+				shaker = shaker->prev)
+		{
+			if (shaker->n < shaker->prev->n)
+			{
+				swap_node_behind(list, &tail, &shaker);
+				print_list((const listint_t *)*list);
+				shaken_not_stirred = false;
+			}
+		}
 	}
-	count_arr = malloc(sizeof(int) * (max_val + 1));
-	if (count_arr == NULL)
-		return;
-	array_sorted = malloc(sizeof(int) * size);
-	if (array_sorted == NULL)
-	{
-		free(count_arr);
-		return;
-	}
-	for (i = 0; i < (size_t)(max_val + 1); i++)
-		count_arr[i] = 0;
-	for (i = 0; i < size; i++)
-		count_arr[array[i]]++;
-	for (i = 1; i < (size_t)(max_val + 1); i++)
-		count_arr[i] += count_arr[i - 1];
-	print_array(count_arr, max_val + 1);
-	for (i = size - 1; ; i--)
-	{
-		count_arr[array[i]]--;
-		array_sorted[count_arr[array[i]]] = array[i];
-		if (i == 0)
-			break;
-	}
-	for (i = 0; i < size; i++)
-		array[i] = array_sorted[i];
-	free(array_sorted), free(count_arr);
 }
